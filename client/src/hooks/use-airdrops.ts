@@ -28,6 +28,11 @@ export function useAirdrops(params?: z.infer<typeof api.airdrops.list.input>) {
   });
 }
 
+function getWalletHeader() {
+  const stored = localStorage.getItem("userWallet");
+  return stored ? { "x-wallet-address": stored } : {};
+}
+
 export function useCreateAirdrop() {
   const queryClient = useQueryClient();
   
@@ -36,7 +41,10 @@ export function useCreateAirdrop() {
       const payload = api.airdrops.create.input.parse(data);
       const res = await fetch(api.airdrops.create.path, {
         method: api.airdrops.create.method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getWalletHeader()
+        },
         body: JSON.stringify(payload),
         credentials: "include",
       });
@@ -59,7 +67,10 @@ export function useUpdateAirdrop() {
       
       const res = await fetch(url, {
         method: api.airdrops.update.method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getWalletHeader()
+        },
         body: JSON.stringify(payload),
         credentials: "include",
       });
@@ -80,6 +91,7 @@ export function useDeleteAirdrop() {
       const url = buildUrl(api.airdrops.delete.path, { id });
       const res = await fetch(url, {
         method: api.airdrops.delete.method,
+        headers: getWalletHeader(),
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to delete airdrop");

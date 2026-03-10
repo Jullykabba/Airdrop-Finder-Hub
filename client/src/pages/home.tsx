@@ -3,7 +3,8 @@ import { useAirdrops } from "@/hooks/use-airdrops";
 import { AirdropCard } from "@/components/airdrop-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Rocket } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, Filter, Rocket, Coins } from "lucide-react";
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -92,6 +93,3 @@ export default function Home() {
     </div>
   );
 }
-
-// Needed Badge import for Hero
-import { Badge } from "@/components/ui/badge";

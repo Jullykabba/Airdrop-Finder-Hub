@@ -11,11 +11,19 @@ function parseWithLogging<T>(schema: z.ZodSchema<T>, data: unknown, label: strin
   return result.data;
 }
 
+function getWalletHeader() {
+  const stored = localStorage.getItem("userWallet");
+  return stored ? { "x-wallet-address": stored } : {};
+}
+
 export function useAuth() {
   return useQuery({
     queryKey: [api.auth.me.path],
     queryFn: async () => {
-      const res = await fetch(api.auth.me.path, { credentials: "include" });
+      const res = await fetch(api.auth.me.path, { 
+        credentials: "include",
+        headers: getWalletHeader()
+      });
       if (res.status === 401) return null; // Not logged in
       if (!res.ok) throw new Error("Failed to fetch profile");
       const data = await res.json();
@@ -47,9 +55,13 @@ export function useLogin() {
       }
       
       const data = await res.json();
-      return res.status === 200 
+      const user = res.status === 200 
         ? parseWithLogging(api.auth.login.responses[200], data, "auth.login(200)")
         : parseWithLogging(api.auth.login.responses[201], data, "auth.login(201)");
+      
+      // Store wallet address for future requests
+      localStorage.setItem("userWallet", walletAddress);
+      return user;
     },
     onSuccess: (user) => {
       queryClient.setQueryData([api.auth.me.path], user);
@@ -66,7 +78,10 @@ export function useUpdateProfile() {
       const payload = api.auth.update.input.parse(updates);
       const res = await fetch(api.auth.update.path, {
         method: api.auth.update.method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getWalletHeader()
+        },
         body: JSON.stringify(payload),
         credentials: "include",
       });
@@ -82,17 +97,17 @@ export function useUpdateProfile() {
   });
 }
 
-// Helper hook for logout since it might just clear local state/cookie
+// Helper hook for logout
 export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      // If there's a real logout endpoint, call it here. 
-      // For MVP simulation, we might just wipe the cookie/session server-side.
-      await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+      // Clear local storage
+      localStorage.removeItem("userWallet");
     },
     onSuccess: () => {
       queryClient.setQueryData([api.auth.me.path], null);
+      queryClient.clear();
       window.location.href = '/';
     }
   });
