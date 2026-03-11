@@ -11,7 +11,7 @@ function parseWithLogging<T>(schema: z.ZodSchema<T>, data: unknown, label: strin
   return result.data;
 }
 
-function getWalletHeader() {
+export function getWalletHeader() {
   const stored = localStorage.getItem("userWallet");
   return stored ? { "x-wallet-address": stored } : {};
 }
@@ -20,22 +20,22 @@ export function useAuth() {
   return useQuery({
     queryKey: [api.auth.me.path],
     queryFn: async () => {
-      const res = await fetch(api.auth.me.path, { 
+      const res = await fetch(api.auth.me.path, {
         credentials: "include",
-        headers: getWalletHeader()
+        headers: getWalletHeader(),
       });
-      if (res.status === 401) return null; // Not logged in
+      if (res.status === 401) return null;
       if (!res.ok) throw new Error("Failed to fetch profile");
       const data = await res.json();
       return parseWithLogging(api.auth.me.responses[200], data, "auth.me");
     },
-    staleTime: Infinity, // Profile doesn't change often
+    staleTime: Infinity,
   });
 }
 
 export function useLogin() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (walletAddress: string) => {
       const payload = api.auth.login.input.parse({ walletAddress });
@@ -45,21 +45,18 @@ export function useLogin() {
         body: JSON.stringify(payload),
         credentials: "include",
       });
-      
+
       if (!res.ok) {
-        if (res.status === 400) {
-          const err = await res.json();
-          throw new Error(err.message || "Invalid wallet address");
-        }
-        throw new Error("Failed to login");
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to login");
       }
-      
+
       const data = await res.json();
-      const user = res.status === 200 
-        ? parseWithLogging(api.auth.login.responses[200], data, "auth.login(200)")
-        : parseWithLogging(api.auth.login.responses[201], data, "auth.login(201)");
-      
-      // Store wallet address for future requests
+      const user =
+        res.status === 200
+          ? parseWithLogging(api.auth.login.responses[200], data, "auth.login(200)")
+          : parseWithLogging(api.auth.login.responses[201], data, "auth.login(201)");
+
       localStorage.setItem("userWallet", walletAddress);
       return user;
     },
@@ -72,22 +69,21 @@ export function useLogin() {
 
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (updates: z.infer<typeof api.auth.update.input>) => {
       const payload = api.auth.update.input.parse(updates);
       const res = await fetch(api.auth.update.path, {
         method: api.auth.update.method,
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          ...getWalletHeader()
+          ...getWalletHeader(),
         },
         body: JSON.stringify(payload),
         credentials: "include",
       });
-      
+
       if (!res.ok) throw new Error("Failed to update profile");
-      
       const data = await res.json();
       return parseWithLogging(api.auth.update.responses[200], data, "auth.update");
     },
@@ -97,18 +93,23 @@ export function useUpdateProfile() {
   });
 }
 
-// Helper hook for logout
 export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      // Clear local storage
       localStorage.removeItem("userWallet");
     },
     onSuccess: () => {
       queryClient.setQueryData([api.auth.me.path], null);
       queryClient.clear();
-      window.location.href = '/';
-    }
+      window.location.href = "/";
+    },
   });
+}
+
+/** Convenience hook — returns { user, logout, isLoading } */
+export function useUser() {
+  const { data: user, isLoading } = useAuth();
+  const { mutate: logout } = useLogout();
+  return { user: user ?? null, logout, isLoading };
 }
