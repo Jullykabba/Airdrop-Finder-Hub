@@ -12,7 +12,18 @@ export default function Home() {
   const { data: airdrops, isLoading } = useAirdrops({ search, network });
 
   const networks = ["All", "Ethereum", "BSC", "Solana", "Polygon", "TON", "Arbitrum"];
-
+  const connectWallet = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        alert("Wallet Connected: " + accounts[0]);
+      } catch (error) {
+        alert("Connection cancelled.");
+      }
+    } else {
+      alert("Please install MetaMask to use this feature!");
+    }
+  };
   return (
     <div className="pb-16">
       {/* Hero Section */}
@@ -32,10 +43,10 @@ export default function Home() {
             AirdropAlert <br className="hidden md:block"/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-primary">
               Nigeria
-            </span>  🇳🇬 Again
+            </span>  🇳🇬
           </h1>
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 text-balance">
-            The #1 platform for Naija crypto hunters to find verified airdrops.".
+            The #1 platform for Naija crypto hunters to find verified airdrops.
           </p>
         </div>
       </section>

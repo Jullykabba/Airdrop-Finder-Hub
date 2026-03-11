@@ -107,11 +107,14 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
-/* Hide Replit Badge */
-#replit-badge {
+/* The Ultimate Hide */
+[class^="replit-badge"], 
+#replit-badge, 
+.replit-badge,
+iframe[src*="replit.com/badge"] {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
-.replit-auth-button {
-  display: none !important;
-}
