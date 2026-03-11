@@ -107,3 +107,11 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+/* Hide Replit Badge */
+#replit-badge {
+  display: none !important;
+}
+
+.replit-auth-button {
+  display: none !important;
+}

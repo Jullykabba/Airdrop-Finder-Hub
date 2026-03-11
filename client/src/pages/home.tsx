@@ -29,13 +29,13 @@ export default function Home() {
             Discover the Best Web3 Opportunities
           </Badge>
           <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-6 text-balance mx-auto">
-            Never Miss a Lucrative <br className="hidden md:block"/>
+            AirdropAlert <br className="hidden md:block"/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-primary">
-              Crypto Airdrop
-            </span> Again
+              Nigeria
+            </span>  🇳🇬 Again
           </h1>
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 text-balance">
-            Track, filter, and claim verified crypto airdrops across multiple networks. Built specifically for the Nigerian crypto community.
+            The #1 platform for Naija crypto hunters to find verified airdrops.".
           </p>
         </div>
       </section>
