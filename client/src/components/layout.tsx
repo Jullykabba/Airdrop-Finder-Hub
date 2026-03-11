@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth, useLogout } from "@/hooks/use-auth";
 import { CryptoTicker } from "./crypto-ticker";
-
+import { WalletModal } from "./wallet-modal";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Coins, Shield, Crown, User as UserIcon, LogOut } from "lucide-react";
 
@@ -11,26 +11,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading } = useAuth();
   const { mutate: logout } = useLogout();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  const connectWallet = async () => {
-    const ethereum = (window as any).ethereum;
-    if (ethereum) {
-      try {
-        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        alert("Wallet Connected: " + accounts[0]);
-      } catch (error) {
-        alert("Connection cancelled.");
-      }
-    } else {
-      alert("Please install MetaMask!");
-    }
-  };
+  const [isWalletModalOpen, setWalletModalOpen] = useState(false);
+
   const navLinks = [
     { href: "/", label: "Airdrops", icon: Coins },
     ...(user?.isAdmin ? [{ href: "/admin", label: "Admin Panel", icon: Shield }] : []),
     ...(user ? [{ href: "/profile", label: "Profile", icon: UserIcon }] : []),
-    { href: "https://wa.me/2349133719207?text=I%20want%20to%20join%20AirdropAlertNG%20Premium", label: "Premium", icon: Crown },
-
+    { href: "/premium", label: "Premium", icon: Crown },
   ];
 
   return (
@@ -137,10 +124,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   Disconnect Wallet
                 </Button>
               ) : (
-                <Button className="w-full h-12 text-lg" onClick={() => {
-                    connectWallet();
-                    setMobileMenuOpen(false);
-                  }} >
+                <Button className="w-full h-12 text-lg" onClick={() => { setWalletModalOpen(true); setMobileMenuOpen(false); }}>
                   Connect Wallet
                 </Button>
               )}
@@ -149,6 +133,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
+      <WalletModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
 
       <main className="flex-1 w-full relative">
         {children}
@@ -157,29 +142,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <footer className="bg-white dark:bg-slate-950 border-t border-border py-8 text-center text-sm text-muted-foreground">
         <p>© {new Date().getFullYear()} AirdropAlertNG. Designed for the Nigerian Crypto Community.</p>
       </footer>
-      <a
-        href="https://wa.me/2349133719207" 
-        target="_blank"
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          backgroundColor: '#25D366',
-          color: 'white',
-          padding: '12px 24px',
-          borderRadius: '50px',
-          fontWeight: 'bold',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-          textDecoration: 'none'
-        }}
-      >
-        <span>Chat with us 🇳🇬</span>
-      </a>
-
     </div>
   );
 }
