@@ -23,17 +23,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <CryptoTicker />
-      
+
       <header className="sticky top-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-lg border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            
+
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
                 <Coins className="w-5 h-5 text-white" />
               </div>
-              <span className="font-display font-bold text-xl tracking-tight text-foreground">
+              <span className="font-bold text-xl tracking-tight text-foreground">
                 AirdropAlert<span className="text-primary">NG</span>
               </span>
             </Link>
@@ -48,8 +48,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     key={link.href}
                     href={link.href}
                     className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                      isActive 
-                        ? "text-primary font-semibold" 
+                      isActive
+                        ? "text-primary font-semibold"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -60,27 +60,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
               })}
             </nav>
 
-            {/* Auth/Connect Desktop */}
+            {/* Auth Desktop */}
             <div className="hidden md:flex items-center gap-4">
               {!isLoading && (
                 user ? (
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col text-right">
-                      <span className="text-xs font-mono font-medium text-foreground">
-                        {user.walletAddress.substring(0, 6)}...{user.walletAddress.substring(user.walletAddress.length - 4)}
+                      <span className="text-xs font-mono font-medium text-foreground truncate max-w-[120px]">
+                        {user.walletAddress.substring(0, 6)}...{user.walletAddress.slice(-4)}
                       </span>
                       {user.isPremium && (
-                        <span className="text-[10px] uppercase font-bold text-accent tracking-wider">Premium</span>
+                        <span className="text-[10px] uppercase font-bold text-yellow-500 tracking-wider">Premium</span>
                       )}
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => logout()} title="Logout">
+                    <Button variant="ghost" size="icon" onClick={() => logout()} title="Disconnect Wallet">
                       <LogOut className="w-4 h-4 text-muted-foreground" />
                     </Button>
                   </div>
                 ) : (
-                  <Button 
+                  <Button
                     onClick={() => setWalletModalOpen(true)}
-                    className="shadow-md shadow-primary/20 hover:shadow-lg hover:-translate-y-0.5 transition-all font-semibold rounded-full px-6"
+                    className="shadow-md shadow-primary/20 font-semibold rounded-full px-6"
+                    data-testid="button-connect-wallet"
                   >
                     Connect Wallet
                   </Button>
@@ -89,9 +90,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Mobile Menu Toggle */}
-            <button 
+            <button
               className="md:hidden p-2 text-muted-foreground"
               onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+              data-testid="button-mobile-menu"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -99,10 +101,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-[104px] z-30 bg-white dark:bg-slate-950 p-4 border-t border-border animate-in slide-in-from-top-2">
-          <div className="flex flex-col gap-4">
+        <div className="md:hidden fixed inset-0 top-[104px] z-30 bg-white dark:bg-slate-950 p-4 border-t border-border">
+          <div className="flex flex-col gap-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
               return (
@@ -117,14 +119,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               );
             })}
-            
-            <div className="pt-4 border-t border-border mt-4">
+
+            <div className="pt-4 border-t border-border mt-2">
               {user ? (
-                <Button variant="destructive" className="w-full h-12" onClick={() => { logout(); setMobileMenuOpen(false); }}>
+                <Button
+                  variant="destructive"
+                  className="w-full h-12"
+                  onClick={() => { logout(); setMobileMenuOpen(false); }}
+                >
                   Disconnect Wallet
                 </Button>
               ) : (
-                <Button className="w-full h-12 text-lg" onClick={() => { setWalletModalOpen(true); setMobileMenuOpen(false); }}>
+                <Button
+                  className="w-full h-12 text-lg"
+                  onClick={() => { setWalletModalOpen(true); setMobileMenuOpen(false); }}
+                >
                   Connect Wallet
                 </Button>
               )}
@@ -140,7 +149,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </main>
 
       <footer className="bg-white dark:bg-slate-950 border-t border-border py-8 text-center text-sm text-muted-foreground">
-        <p>© {new Date().getFullYear()} AirdropAlertNG. Designed for the Nigerian Crypto Community.</p>
+        <p>© {new Date().getFullYear()} AirdropAlertNG — Built for the Nigerian Crypto Community.</p>
       </footer>
     </div>
   );
