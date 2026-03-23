@@ -37,3 +37,8 @@ author = "agent"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[userenv]
+
+[userenv.shared]
+"DATABASE _URL" = "postgresql://airdrop_hub_hzrd_user:b84Ka2cnuZVZyL0MRg0R0ug2LuEyqKPh@dpg-d70qi67fte5s738qab9g-a.oregon-postgres.render.com/airdrop_hub_hzrd"
