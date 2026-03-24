@@ -3,27 +3,37 @@ import * as schema from "../shared/schema";
 
 async function seed() {
   console.log("Seeding database...");
-  await db.insert(schema.airdrops).values([
-    {
-      token_name: "Scroll",
-      description: "Layer 2 solution using ZK-rollups.",
-      link: "https://scroll.io",
-      value: "High",
-      status: "Active"
-    },
-    {
-      token_name: "Linea",
-      description: "ConsenSys zkEVM network.",
-      link: "https://linea.build",
-      value: "High",
-      status: "Active"
-    }
-  ]);
-  console.log("✅ Seeding complete!");
-  process.exit(0);
+  try {
+    await db.insert(schema.airdrops).values([
+      {
+        tokenName: "Scroll",
+        symbol: "SCR",
+        network: "Scroll Mainnet",
+        rewardAmount: "TBA",
+        description: "Layer 2 solution using ZK-rollups.",
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        isActive: true,
+        link: "https://scroll.io"
+      },
+      {
+        tokenName: "Linea",
+        symbol: "LINEA",
+        network: "Linea Mainnet",
+        rewardAmount: "TBA",
+        description: "ConsenSys zkEVM network.",
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        isActive: true,
+        link: "https://linea.build"
+      }
+    ]);
+    console.log("✅ SEEDING SUCCESSFUL!");
+  } catch (error) {
+    console.error("❌ Seeding failed:", error);
+  } finally {
+    process.exit(0);
+  }
 }
 
-seed().catch((err) => {
-  console.error("❌ Seeding failed:", err);
-  process.exit(1);
-});
+seed();
